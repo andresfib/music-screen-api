@@ -2,6 +2,10 @@
 
 ## General settings
 
+# Folder with slideshow images
+image_path = "~/Pictures"
+show_slideshow = False
+
 # Connection details for `node-sonos-http-api`
 sonos_http_api_address = "localhost"
 sonos_http_api_port = "5005"

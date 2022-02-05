@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 from io import BytesIO
+from pathlib import Path
 
 from aiohttp import ClientError, ClientSession
 from PIL import Image, ImageFile
@@ -55,6 +56,7 @@ async def get_image_data(session, url):
         _LOGGER.warning("Image failed to load: %s [%s]", url, err)
     return None
 
+
 async def redraw(session, sonos_data, display):
     """Redraw the screen with current data."""
     if sonos_data.status == "API error":
@@ -68,6 +70,17 @@ async def redraw(session, sonos_data, display):
             return getattr(sonos_settings, "sleep_on_linein", False)
         if sonos_data.type == "TV":
             return getattr(sonos_settings, "sleep_on_tv", False)
+
+    def should_show_picture():
+        return getattr(sonos_settings, "show_slideshow", False)
+
+    if should_sleep() and should_show_picture():
+        if display.is_showing:
+            image_path = Path(sonos_settings.image_path)
+            slideshow_image = Image.open(image_path / 'test.png')
+            _LOGGER.debug("Showing pictures from  %s", sonos_settings.image_path)
+            display.show_picture(slideshow_image)
+        return
 
     if should_sleep():
         if display.is_showing:
@@ -154,6 +167,7 @@ async def main(loop):
     setup_logging()
     log_git_hash()
     show_details_timeout = getattr(sonos_settings, "show_details_timeout", None)
+
     try:
         display = DisplayController(loop, sonos_settings.show_details, sonos_settings.show_artist_and_album, show_details_timeout)
     except SonosDisplaySetupError:

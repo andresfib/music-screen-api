@@ -168,6 +168,18 @@ class DisplayController:  # pylint: disable=too-many-instance-attributes
         self.curtain_frame.lift()
         self.root.update()
 
+    def show_picture(self, image):
+        "Show one picture from folder"
+        if self.timeout_future:
+            self.timeout_future.cancel()
+            self.timeout_future = None
+            self.show_album(show_details=False)
+
+        self.curtain_frame.configure(image=ImageTk.PhotoImage(img))
+        self.curtain_frame.lift()
+        self.root.update()
+
+
     def update(self, image, sonos_data):
         """Update displayed image and text."""
 
