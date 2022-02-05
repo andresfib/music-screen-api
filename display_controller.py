@@ -32,6 +32,9 @@ class DisplayController:  # pylint: disable=too-many-instance-attributes
 
         self.album_image = None
         self.thumb_image = None
+        self.slideshow_image = None
+        self.slideshow_thumb_image = None
+
         self.timeout_future = None
         self.is_showing = False
 
@@ -66,6 +69,20 @@ class DisplayController:  # pylint: disable=too-many-instance-attributes
             self.root, bg="black", width=SCREEN_W, height=SCREEN_H
         )
         self.curtain_frame.grid(row=0, column=0, sticky="news")
+
+        self.slideshow_frame = tk.Frame(
+            self.root, bg="black", width=SCREEN_W, height=SCREEN_H
+        )
+        self.slideshow_frame.grid(row=0, column=0, sticky="news")
+        self.label_slideshow = tk.Label(
+            self.slideshow_frame,
+            image=None,
+            borderwidth=0,
+            highlightthickness=0,
+            fg="white",
+            bg="black",
+        )
+        self.label_slideshow.place(x=0, y=0)
 
         self.track_name = tk.StringVar()
         self.detail_text = tk.StringVar()
@@ -175,9 +192,20 @@ class DisplayController:  # pylint: disable=too-many-instance-attributes
             self.timeout_future = None
             self.show_album(show_details=False)
 
-        self.curtain_frame.configure(image=ImageTk.PhotoImage(img))
-        self.curtain_frame.lift()
+        def resize_image(image, width, height):
+            """Resizes the image, assumes square image."""
+            image = image.resize((width, height), ImageTk.Image.ANTIALIAS)
+            return ImageTk.PhotoImage(image)
+
+        # Store the images as attributes to preserve scope for Tk
+        self.slideshow_image = resize_image(image, SCREEN_W, SCREEN_H)
+
+
+        self.label_slideshow.configure(image=self.slideshow_image)
+
+        self.slideshow_frame.lift()
         self.root.update()
+        self.backlight.set_power(True)
 
 
     def update(self, image, sonos_data):

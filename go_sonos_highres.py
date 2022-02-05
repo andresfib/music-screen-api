@@ -115,7 +115,13 @@ async def redraw(session, sonos_data, display):
 
         display.update(pil_image, sonos_data)
     else:
-        display.hide_album()
+        if should_show_picture():
+            image_path = Path(sonos_settings.image_path)
+            slideshow_image = Image.open(image_path / 'test.png')
+            _LOGGER.debug("Showing pictures from  %s", sonos_settings.image_path)
+            display.show_picture(slideshow_image)
+        else:
+            display.hide_album()
 
 def log_git_hash():
     """Log the current git hash for troubleshooting purposes."""
