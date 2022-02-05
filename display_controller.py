@@ -10,10 +10,10 @@ from hyperpixel_backlight import Backlight
 
 _LOGGER = logging.getLogger(__name__)
 
-SCREEN_W = 720
-SCREEN_H = 720
-THUMB_W = 600
-THUMB_H = 600
+SCREEN_W = 480
+SCREEN_H = 800
+THUMB_W = 480
+THUMB_H = 480
 
 
 class SonosDisplaySetupError(Exception):
@@ -69,12 +69,15 @@ class DisplayController:  # pylint: disable=too-many-instance-attributes
 
         self.track_name = tk.StringVar()
         self.detail_text = tk.StringVar()
+        self.artist_name = tk.StringVar()
+        self.album_name = tk.StringVar()
 
         if show_artist_and_album:
-            track_font = tkFont.Font(family="Helvetica", size=30)
+            track_font = tkFont.Font(family="Helvetica", size=20)
         else:
             track_font = tkFont.Font(family="Helvetica", size=40)
-        detail_font = tkFont.Font(family="Helvetica", size=15)
+
+        detail_font = tkFont.Font(family="Helvetica", size=40)
 
         self.label_albumart = tk.Label(
             self.album_frame,
@@ -84,7 +87,7 @@ class DisplayController:  # pylint: disable=too-many-instance-attributes
             fg="white",
             bg="black",
         )
-        self.label_albumart.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        self.label_albumart.place(x=0, y=0)
 
         self.label_albumart_detail = tk.Label(
             self.detail_frame,
@@ -100,21 +103,31 @@ class DisplayController:  # pylint: disable=too-many-instance-attributes
             font=track_font,
             fg="white",
             bg="black",
-            wraplength=600,
+            wraplength=480,
             justify="center",
         )
-        label_detail = tk.Label(
+        label_artist = tk.Label(
             self.detail_frame,
-            textvariable=self.detail_text,
+            textvariable=self.artist_name,
             font=detail_font,
             fg="white",
             bg="black",
-            wraplength=600,
+            wraplength=480,
+            justify="center",
+        )
+        label_album = tk.Label(
+            self.detail_frame,
+            textvariable=self.album_name,
+            font=detail_font,
+            fg="white",
+            bg="black",
+            wraplength=480,
             justify="center",
         )
         self.label_albumart_detail.place(relx=0.5, y=THUMB_H / 2, anchor=tk.CENTER)
-        label_track.place(relx=0.5, y=THUMB_H + 20, anchor=tk.N)
-        label_detail.place(relx=0.5, y=SCREEN_H - 10, anchor=tk.S)
+        label_artist.place(relx=0.5, y=THUMB_H + 20, anchor=tk.N)
+        label_track.place(relx=0.5, y=THUMB_H + ((SCREEN_H - THUMB_H) / 2), anchor=tk.CENTER)
+        label_album.place(relx=0.5, y=SCREEN_H - 10, anchor=tk.S)
 
         self.album_frame.grid_propagate(False)
         self.detail_frame.grid_propagate(False)
@@ -171,19 +184,25 @@ class DisplayController:  # pylint: disable=too-many-instance-attributes
         self.label_albumart_detail.configure(image=self.thumb_image)
 
         detail_text = ""
+        album_name = ""
+        artist_name = ""
+
         display_trackname = sonos_data.trackname or sonos_data.station
 
         if self.show_artist_and_album:
             detail_prefix = None
             detail_suffix = sonos_data.album or None
-
+            album_name= sonos_data.album or ""
             if sonos_data.artist != display_trackname:
                 detail_prefix = sonos_data.artist
+                artist_name = sonos_data.artist or ""
 
             detail_text = " • ".join(filter(None, [detail_prefix, detail_suffix]))
 
         self.track_name.set(display_trackname)
         self.detail_text.set(detail_text)
+        self.artist_name.set(artist_name)
+        self.album_name.set(album_name)
         self.root.update_idletasks()
         self.show_album(self.show_details, self.show_details_timeout)
 
