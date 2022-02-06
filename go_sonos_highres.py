@@ -19,6 +19,7 @@ import async_demaster
 from display_controller import DisplayController, SonosDisplaySetupError
 from sonos_user_data import SonosData
 from webhook_handler import SonosWebhook
+from slideshow_controller import SlideshowController
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ async def get_image_data(session, url):
     return None
 
 
-async def redraw(session, sonos_data, display):
+async def redraw(session, sonos_data, display, slideshow):
     """Redraw the screen with current data."""
     if sonos_data.status == "API error":
         return
@@ -71,13 +72,9 @@ async def redraw(session, sonos_data, display):
         if sonos_data.type == "TV":
             return getattr(sonos_settings, "sleep_on_tv", False)
 
-    def should_show_picture():
-        return getattr(sonos_settings, "show_slideshow", False)
-
-    if should_sleep() and should_show_picture():
+    if should_sleep() and slideshow.is_enabled():
         if display.is_showing:
-            image_path = Path(sonos_settings.image_path)
-            slideshow_image = Image.open(image_path / 'test.png')
+            slideshow_image = Image.open(slideshow.get_next_image())
             _LOGGER.debug("Showing pictures from  %s", sonos_settings.image_path)
             display.show_picture(slideshow_image)
         return
@@ -179,6 +176,7 @@ async def main(loop):
     except SonosDisplaySetupError:
         loop.stop()
         return
+    slideshow = SlideshowController(sonos_settings)
 
     if sonos_settings.room_name_for_highres == "":
         print ("No room name found in sonos_settings.py")
@@ -201,7 +199,7 @@ async def main(loop):
 
     async def webhook_callback():
         """Callback to trigger after webhook is processed."""
-        await redraw(session, sonos_data, display)
+        await redraw(session, sonos_data, display, slideshow)
 
     webhook = SonosWebhook(display, sonos_data, webhook_callback)
     await webhook.listen()
@@ -217,7 +215,7 @@ async def main(loop):
 
         if time.time() - sonos_data.last_update > update_interval:
             await sonos_data.refresh()
-            await redraw(session, sonos_data, display)
+            await redraw(session, sonos_data, display, slideshow)
         await asyncio.sleep(1)
 
 async def cleanup(loop, session, webhook, display):
