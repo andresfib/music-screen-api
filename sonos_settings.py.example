@@ -5,6 +5,8 @@
 # Folder with slideshow images
 images_path = "~/Pictures"
 show_slideshow = False
+# List of cron expressions we want the slideshow to appear. Example below has different "working hours for weekdays and weekends
+slideshow_timers = ["* 16-21 * * MON-FRI", "* 12-21 * * SAT-SUN"] 
 
 # Connection details for `node-sonos-http-api`
 sonos_http_api_address = "localhost"
