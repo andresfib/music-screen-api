@@ -16,7 +16,7 @@ class SlideshowController:
                 _LOGGER.error("Cannot access path: %s, check that it exists", images_path)
                 _LOGGER.error(error)
             self.images_files = list(self.images_path.glob("*.png"))
-            if len(images_files) is 0:
+            if len(self.images_files) is 0:
                 self.show_slideshow = False
                 _LOGGER.error("There are no png files in path: %s, slideshow not started", images_path)
             self.next_image_index = 0
@@ -24,7 +24,7 @@ class SlideshowController:
     def get_next_image(self):
         if self.is_enabled():
             next_image = self.images_files[self.next_image_index]
-            self.next_image_index = (self.next_image_index + 1) % self.images_files.size
+            self.next_image_index = (self.next_image_index + 1) % len(self.images_files)
             return next_image
         else:
             _LOGGER.error("Not getting next image slideshow is disabled!")
