@@ -29,7 +29,7 @@ class SonosData():
         self.previous_track = None
         self.room = sonos_room
         self.session = session
-        self.webhook_active = False
+        self.webhook_active = getattr(sonos_settings, "webhook_active", False)
         self._speaker_uri = None
         self._track_is_new = True
 

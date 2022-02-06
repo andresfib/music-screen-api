@@ -75,7 +75,7 @@ async def redraw(session, sonos_data, display, slideshow):
     if should_sleep() and slideshow.is_enabled():
         if display.is_showing:
             slideshow_image = Image.open(slideshow.get_next_image())
-            _LOGGER.debug("Showing %s", slideshow_image)
+            _LOGGER.debug("Showing start %s", slideshow_image)
             display.show_picture(slideshow_image)
         return
 
@@ -114,7 +114,7 @@ async def redraw(session, sonos_data, display, slideshow):
     else:
         if slideshow.is_enabled():
             slideshow_image = Image.open(slideshow.get_next_image())
-            _LOGGER.debug("Showing %s", slideshow_image)
+            _LOGGER.debug("Showing not playing %s", slideshow_image)
             display.show_picture(slideshow_image)
         else:
             display.hide_album()
@@ -202,6 +202,7 @@ async def main(loop):
 
     webhook = SonosWebhook(display, sonos_data, webhook_callback)
     await webhook.listen()
+    _LOGGER.debug("We launched the webhook listener")
 
     for signame in ('SIGINT', 'SIGTERM', 'SIGQUIT'):
         loop.add_signal_handler(getattr(signal, signame), lambda: asyncio.ensure_future(cleanup(loop, session, webhook, display)))

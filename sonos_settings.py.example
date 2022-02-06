@@ -9,6 +9,7 @@ show_slideshow = False
 # Connection details for `node-sonos-http-api`
 sonos_http_api_address = "localhost"
 sonos_http_api_port = "5005"
+webhook_active = True # This makes slideshow implementation easier, make sure webhook is enabled in node sonos http api server
 
 # Location of log file to write in addition to printing to screen. Comment out to disable
 log_file = "~/music-screen-api.log"
