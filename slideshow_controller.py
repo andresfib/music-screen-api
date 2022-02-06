@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 from pathlib import Path
+from functools import reduce
 
 from croniter import croniter
 
