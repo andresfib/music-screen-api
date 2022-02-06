@@ -36,7 +36,7 @@ class SlideshowController:
             _LOGGER.error("Not getting next image slideshow is disabled!")
 
     def is_enabled(self):
-        time = datetime.datetime.now()
+        time = datetime.now()
         is_enabled = self.show_slideshow and reduce(lambda x,y: x or croniter.match(y, time), self.slideshow_timers, True)
         return is_enabled
 
