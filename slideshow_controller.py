@@ -1,3 +1,4 @@
+
 import logging
 from datetime import datetime
 from pathlib import Path
@@ -38,6 +39,6 @@ class SlideshowController:
 
     def is_enabled(self):
         time = datetime.now()
-        is_enabled = self.show_slideshow and reduce(lambda x,y: x or croniter.match(y, time), self.slideshow_timers, True)
+        is_enabled = self.show_slideshow and reduce(lambda x,y: x or croniter.match(y, time), self.slideshow_timers, False)
         return is_enabled
 
